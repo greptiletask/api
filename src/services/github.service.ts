@@ -192,16 +192,9 @@ class GithubService {
 
       console.log(changelog, "[GENERATE FLOW]: CHANGELOG");
 
-      const changeLogInDb = await Changelog.create({
-        userId: userSub,
+      return {
         changelog: response.choices[0].message.content,
-        version: version || "v0.0.0",
-        repo: `${owner}/${repo}`,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      return changeLogInDb;
+      };
     } catch (error) {
       console.error(error, "ERROR FROM GENERATE CHANGELOG");
       return { error: "Failed to generate changelog" };

@@ -6,6 +6,7 @@ import verifyToken from "./middleware/verifyToken";
 import userRouter from "./routers/user.router";
 import cors from "cors";
 import connectDB from "./configs/db.config";
+import changelogRouter from "./routers/changelog.router";
 dotenv.config();
 
 const app: Express = express();
@@ -25,6 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", verifyToken, userRouter);
 
 app.use("/api/github", verifyToken, githubRouter);
+
+app.use("/api/changelog", changelogRouter);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
