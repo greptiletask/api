@@ -8,6 +8,7 @@ import { GITHUB_API_URL } from "../utils/constants";
 import { openai } from "../configs/openai.client";
 import { fetchUserRepos } from "../workers/fetch-repos";
 import { fetchCommits, fetchCommitDiffs } from "../workers/fetch-diffs";
+import { logToFile } from "../utils/log";
 dotenv.config();
 
 class GithubService {
@@ -132,6 +133,9 @@ class GithubService {
     if (!user) {
       return { error: "User not found" };
     }
+
+    console.log(start, end, owner, repo, "START AND END AND OWNER AND REPO");
+    await logToFile("changelog.log", `start: ${start}, end: ${end}, owner: ${owner}, repo: ${repo}`);
 
     const commits = await fetchCommits({
       start,
