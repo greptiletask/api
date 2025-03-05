@@ -2,7 +2,7 @@ import { decodeJwt } from "@clerk/backend/jwt";
 import { clerkClient } from "../configs/auth.config";
 import { NextFunction, Response } from "express";
 
-export const verifyToken = async (
+const verifyToken = async (
   req: any,
   res: Response,
   next: NextFunction
@@ -29,3 +29,5 @@ export const verifyToken = async (
   req.userSub = user.id;
   next();
 };
+
+export default verifyToken;
