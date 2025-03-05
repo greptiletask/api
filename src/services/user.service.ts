@@ -5,7 +5,10 @@ class UserService {
     try {
       const existingUser = await User.findOne({ sub: user.sub });
       if (existingUser) {
-        return existingUser;
+        return {
+          status: 200,
+          user: existingUser,
+        };
       }
 
       const newUser = new User(user);
@@ -30,22 +33,16 @@ class UserService {
     }
 
     try {
-      // Check if the user exists in the database
       let user = await User.findOne({ sub: userSub });
       console.log("user from db", user);
 
       if (!user) {
         const clerkUser = await clerkClient.users.getUser(userSub);
 
-        // Create a new user in the database
         const { status, user: newUser } = await this.createUser({
           sub: userSub,
           email: clerkUser.emailAddresses[0].emailAddress,
           accessToken: null,
-          totalLinesOfCodeReviewed: 0,
-          totalPRsReviewed: 0,
-          creditsUsed: 0,
-          stripeCustomerId: null,
         });
 
         if (status !== 200) {
