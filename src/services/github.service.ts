@@ -1,9 +1,8 @@
 import fetch from "node-fetch";
 import User from "../models/user.model";
-
+import Changelog from "../models/changelog.model";
 import dotenv from "dotenv";
 import { prompt } from "../utils/prompt";
-import { EXCLUDED_FILES } from "../utils/excludedFiles";
 import { GITHUB_API_URL } from "../utils/constants";
 
 import { openai } from "../configs/openai.client";
@@ -13,7 +12,7 @@ dotenv.config();
 
 class GithubService {
   async fetchGHUser(ghToken: string) {
-    const response = await fetch("https://api.github.com/user", {
+    const response = await fetch(`${GITHUB_API_URL}/user`, {
       headers: {
         Authorization: `Bearer ${ghToken}`,
       },
@@ -89,23 +88,29 @@ class GithubService {
     return repos;
   }
 
-  async generateChangelog(userId: string, repo: string) {
+  async generateChangelog(
+    userId: string,
+    owner: string,
+    repo: string,
+    start: string,
+    end: string
+  ) {
     const user = await User.findOne({ sub: userId });
     if (!user) {
       return { error: "User not found" };
     }
 
     const commits = await fetchCommits({
-      start: "2024-01-01",
-      end: "2024-01-02",
-      owner: user.username,
+      start,
+      end,
+      owner,
       repo,
       token: user.accessToken,
     });
 
     const commitDiffs = await Promise.all(
       commits.map((commit: any) =>
-        fetchCommitDiffs(commit.sha, user.username, repo, user.accessToken)
+        fetchCommitDiffs(commit.sha, owner, repo, user.accessToken)
       )
     );
 
@@ -127,7 +132,12 @@ class GithubService {
 
     const changelog = JSON.parse(response.choices[0].message.content);
 
-    return changelog;
+    const changeLogInDb = await Changelog.create({
+      userId,
+      changelog: response.choices[0].message.content,
+    });
+
+    return changeLogInDb;
   }
 }
 
