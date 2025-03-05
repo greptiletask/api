@@ -141,4 +141,6 @@ class GithubService {
   }
 }
 
-export default GithubService;
+const githubService = new GithubService();
+
+export default githubService;
