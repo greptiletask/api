@@ -114,10 +114,41 @@ async function generateChangelogController(req: Request, res: Response) {
   }
 }
 
+async function fetchCommitsController(req: Request, res: Response) {
+  try {
+    const userSub = (req as any).userSub;
+    const { owner, repo, start, end } = req.query;
+
+    if (!userSub || !owner || !repo || !start || !end) {
+      return res
+        .status(400)
+        .json({ error: "userSub, owner, repo, start, end are required" });
+    }
+
+    const commits = await githubService.fetchCommits(
+      userSub,
+      owner as string,
+      repo as string,
+      start as string,
+      end as string
+    );
+
+    if ((commits as any).error) {
+      return res.status(400).json(commits);
+    }
+
+    return res.json(commits);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to fetch commits" });
+  }
+}
+
 export const GithubController = {
   fetchGHUserController,
   exchangeTokenController,
   updateAccessTokenController,
   fetchReposController,
   generateChangelogController,
+  fetchCommitsController,
 };

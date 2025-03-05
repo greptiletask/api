@@ -43,4 +43,12 @@ router.post("/generate-changelog", (req, res) => {
   GithubController.generateChangelogController(req, res);
 });
 
+/**
+ * GET /github/commits
+ * Query param: ?userId=xxx&owner=xxx&repo=xxx&start=xxx&end=xxx
+ */
+router.get("/commits", (req, res) => {
+  GithubController.fetchCommitsController(req, res);
+});
+
 export default router;

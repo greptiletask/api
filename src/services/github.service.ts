@@ -95,6 +95,32 @@ class GithubService {
     return repos;
   }
 
+  async fetchCommits(
+    userSub: string,
+    owner: string,
+    repo: string,
+    start: string,
+    end: string
+  ) {
+    const user = await User.findOne({ sub: userSub });
+    if (!user) {
+      return { error: "User not found" };
+    }
+    try {
+      const commits = await fetchCommits({
+        start,
+        end,
+        owner,
+        repo,
+        token: user.accessToken,
+      });
+      return commits;
+    } catch (error) {
+      console.error(error, "ERROR FROM FETCH COMMITS");
+      return { error: "Failed to fetch commits" };
+    }
+  }
+
   async generateChangelog(
     userSub: string,
     owner: string,
