@@ -7,6 +7,8 @@ import { EXCLUDED_FILES } from "../utils/excludedFiles";
 import { GITHUB_API_URL } from "../utils/constants";
 
 import { openai } from "../configs/openai.client";
+import { fetchUserRepos } from "../workers/fetch-repos";
+import { fetchCommits, fetchCommitDiffs } from "../workers/fetch-diffs";
 dotenv.config();
 
 class GithubService {
@@ -76,6 +78,56 @@ class GithubService {
     }
     const user = await User.findOneAndUpdate({ sub: userId }, { accessToken });
     return user;
+  }
+
+  async fetchRepos(userId: string) {
+    const user = await User.findOne({ sub: userId });
+    if (!user) {
+      return { error: "User not found" };
+    }
+    const repos = await fetchUserRepos(user.accessToken);
+    return repos;
+  }
+
+  async generateChangelog(userId: string, repo: string) {
+    const user = await User.findOne({ sub: userId });
+    if (!user) {
+      return { error: "User not found" };
+    }
+
+    const commits = await fetchCommits({
+      start: "2024-01-01",
+      end: "2024-01-02",
+      owner: user.username,
+      repo,
+      token: user.accessToken,
+    });
+
+    const commitDiffs = await Promise.all(
+      commits.map((commit: any) =>
+        fetchCommitDiffs(commit.sha, user.username, repo, user.accessToken)
+      )
+    );
+
+    const promptData = prompt(
+      commits[0].sha,
+      commits[commits.length - 1].sha,
+      commitDiffs.join("\n")
+    );
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: promptData }],
+      response_format: { type: "json_object" },
+    });
+
+    if (!response.choices[0].message.content) {
+      return { error: "Failed to generate changelog" };
+    }
+
+    const changelog = JSON.parse(response.choices[0].message.content);
+
+    return changelog;
   }
 }
 
