@@ -21,7 +21,7 @@ class GithubService {
     return data;
   }
 
-  async exchangeToken(code: string, userId: string) {
+  async exchangeToken(code: string, userSub: string) {
     try {
       const tokenResponse = await fetch(
         "https://github.com/login/oauth/access_token",
@@ -47,7 +47,7 @@ class GithubService {
         return { error: "Failed to get access token" };
       }
 
-      const user = await User.findOne({ sub: userId });
+      const user = await User.findOne({ sub: userSub });
 
       if (!user) {
         return { error: "User not found" };
@@ -71,16 +71,16 @@ class GithubService {
     }
   }
 
-  async updateAccessToken(userId: string, accessToken: string) {
-    if (!userId || !accessToken) {
+  async updateAccessToken(userSub: string, accessToken: string) {
+    if (!userSub || !accessToken) {
       return { error: "Invalid request." };
     }
-    const user = await User.findOneAndUpdate({ sub: userId }, { accessToken });
+    const user = await User.findOneAndUpdate({ sub: userSub }, { accessToken });
     return user;
   }
 
-  async fetchRepos(userId: string) {
-    const user = await User.findOne({ sub: userId });
+  async fetchRepos(userSub: string) {
+    const user = await User.findOne({ sub: userSub });
     if (!user) {
       return { error: "User not found" };
     }
@@ -89,13 +89,13 @@ class GithubService {
   }
 
   async generateChangelog(
-    userId: string,
+    userSub: string,
     owner: string,
     repo: string,
     start: string,
     end: string
   ) {
-    const user = await User.findOne({ sub: userId });
+    const user = await User.findOne({ sub: userSub });
     if (!user) {
       return { error: "User not found" };
     }
@@ -133,7 +133,7 @@ class GithubService {
     const changelog = JSON.parse(response.choices[0].message.content);
 
     const changeLogInDb = await Changelog.create({
-      userId,
+      userSub,
       changelog: response.choices[0].message.content,
     });
 

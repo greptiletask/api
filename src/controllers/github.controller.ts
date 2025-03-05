@@ -25,12 +25,13 @@ async function fetchGHUserController(req: Request, res: Response) {
 
 async function exchangeTokenController(req: Request, res: Response) {
   try {
-    const { code, userId } = req.body;
-    if (!code || !userId) {
-      return res.status(400).json({ error: "Code and userId are required" });
+    const userSub = (req as any).userSub;
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ error: "Code is required" });
     }
 
-    const result = await githubService.exchangeToken(code, userId);
+    const result = await githubService.exchangeToken(code, userSub);
     if (result.error) {
       return res.status(400).json(result);
     }
@@ -44,15 +45,14 @@ async function exchangeTokenController(req: Request, res: Response) {
 
 async function updateAccessTokenController(req: Request, res: Response) {
   try {
-    const { userId, accessToken } = req.body;
-    if (!userId || !accessToken) {
-      return res
-        .status(400)
-        .json({ error: "userId and accessToken are required" });
+    const userSub = (req as any).userSub;
+    const { accessToken } = req.body;
+    if (!accessToken) {
+      return res.status(400).json({ error: "Access token is required" });
     }
 
     const updatedUser = await githubService.updateAccessToken(
-      userId,
+      userSub,
       accessToken
     );
     if (!updatedUser || (updatedUser as any).error) {
@@ -68,12 +68,9 @@ async function updateAccessTokenController(req: Request, res: Response) {
 
 async function fetchReposController(req: Request, res: Response) {
   try {
-    const { userId } = req.query;
-    if (!userId || typeof userId !== "string") {
-      return res.status(400).json({ error: "userId is required" });
-    }
+    const userSub = (req as any).userSub;
 
-    const repos = await githubService.fetchRepos(userId);
+    const repos = await githubService.fetchRepos(userSub);
     if ((repos as any).error) {
       return res.status(400).json(repos);
     }
@@ -87,16 +84,17 @@ async function fetchReposController(req: Request, res: Response) {
 
 async function generateChangelogController(req: Request, res: Response) {
   try {
-    const { userId, owner, repo, start, end } = req.body;
+    const userSub = (req as any).userSub;
+    const { owner, repo, start, end } = req.body;
 
-    if (!userId || !owner || !repo || !start || !end) {
+    if (!userSub || !owner || !repo || !start || !end) {
       return res
         .status(400)
-        .json({ error: "userId, owner, repo, start, end are required" });
+        .json({ error: "userSub, owner, repo, start, end are required" });
     }
 
     const changelog = await githubService.generateChangelog(
-      userId,
+      userSub,
       owner,
       repo,
       start,
