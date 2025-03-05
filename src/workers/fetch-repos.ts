@@ -1,21 +1,14 @@
-// lib/github.ts
 import axios from "axios";
 import { GITHUB_API_URL } from "../utils/constants";
 
-/**
- * Fetch all repositories for the authenticated user via GitHub API.
- * @param token - The GitHub personal access token or OAuth access token.
- * @param perPage - Number of repos to fetch per page (up to 100).
- * @returns An array of repository objects from GitHub.
- */
 export async function fetchUserRepos(
   token: string,
   perPage = 100
-): Promise<any[]> {
+): Promise<{ id: number; fullName: string }[]> {
   const baseUrl = `${GITHUB_API_URL}/user/repos`;
 
   let page = 1;
-  let allRepos: any[] = [];
+  let allRepos: { id: number; fullName: string }[] = [];
   let hasMore = true;
 
   while (hasMore) {
@@ -30,10 +23,16 @@ export async function fetchUserRepos(
       },
     });
 
+    console.log(data, "DATA FROM FETCH USER REPOS");
+
     if (!data?.length) {
       hasMore = false;
     } else {
-      allRepos = allRepos.concat(data);
+      const mapped = data.map((repo: any) => ({
+        id: repo.id,
+        fullName: repo.full_name,
+      }));
+      allRepos = [...allRepos, ...mapped];
       page += 1;
     }
   }

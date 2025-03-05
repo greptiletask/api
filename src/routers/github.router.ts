@@ -15,12 +15,9 @@ router.post("/exchange-token", (req, res) => {
  * POST /github/update-access-token
  * Request body: { userId, accessToken }
  */
-router.post(
-  "/update-access-token",
-  (req, res) => {
-    GithubController.updateAccessTokenController(req, res);
-  }
-);
+router.post("/update-access-token", (req, res) => {
+  GithubController.updateAccessTokenController(req, res);
+});
 
 /**
  * GET /github/user

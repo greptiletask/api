@@ -12,13 +12,19 @@ dotenv.config();
 
 class GithubService {
   async fetchGHUser(ghToken: string) {
-    const response = await fetch(`${GITHUB_API_URL}/user`, {
-      headers: {
-        Authorization: `Bearer ${ghToken}`,
-      },
-    });
-    const data = await response.json();
-    return data;
+    console.log(ghToken, "GH TOKEN from fetchGHUser");
+    try {
+      const response = await fetch(`${GITHUB_API_URL}/user`, {
+        headers: {
+          Authorization: `Bearer ${ghToken}`,
+        },
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error, "ERROR FROM GH USER");
+      return { error: "Failed to fetch GitHub user" };
+    }
   }
 
   async exchangeToken(code: string, userSub: string) {
@@ -72,6 +78,7 @@ class GithubService {
   }
 
   async updateAccessToken(userSub: string, accessToken: string) {
+    console.log(userSub, accessToken, "USER SUB AND ACCESS TOKEN");
     if (!userSub || !accessToken) {
       return { error: "Invalid request." };
     }

@@ -23,6 +23,7 @@ async function createUserController(req: Request, res: Response) {
 async function fetchOrCreateUserController(req: Request, res: Response) {
   try {
     const { userSub } = req as any;
+    console.log(userSub, "userSub from fetchOrCreateUserController");
     if (!userSub || typeof userSub !== "string") {
       return res.status(400).json({ error: "userSub is required" });
     }
@@ -32,6 +33,7 @@ async function fetchOrCreateUserController(req: Request, res: Response) {
       return res.status(result.status).json({ error: result.message });
     }
 
+    console.log(result, "result from fetchOrCreateUserController");
     return res.json(result);
   } catch (error) {
     console.error("Error in fetchOrCreateUserController:", error);

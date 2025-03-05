@@ -4,9 +4,7 @@ import userService from "../services/user.service";
 
 async function fetchGHUserController(req: Request, res: Response) {
   try {
-    const userSub = (req as any).userSub;
-    const user = await userService.fetchUser(userSub);
-    const token = user.accessToken;
+    const token = req.query.ghToken as string;
     if (!token) {
       return res.status(400).json({ error: "GitHub token is required" });
     }
@@ -75,7 +73,11 @@ async function fetchReposController(req: Request, res: Response) {
       return res.status(400).json(repos);
     }
 
-    return res.json(repos);
+    return res.json({
+      data: repos,
+      message: "Repositories fetched successfully",
+      status: 200,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to fetch repositories" });
