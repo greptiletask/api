@@ -127,7 +127,8 @@ class GithubService {
     owner: string,
     repo: string,
     start: string,
-    end: string
+    end: string,
+    version: string
   ) {
     try {
       const user = await User.findOne({ sub: userSub });
@@ -192,8 +193,12 @@ class GithubService {
       console.log(changelog, "[GENERATE FLOW]: CHANGELOG");
 
       const changeLogInDb = await Changelog.create({
-        userSub,
+        userId: userSub,
         changelog: response.choices[0].message.content,
+        version: version || "v0.0.0",
+        repo: `${owner}/${repo}`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
 
       return changeLogInDb;
