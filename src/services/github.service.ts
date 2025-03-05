@@ -129,52 +129,78 @@ class GithubService {
     start: string,
     end: string
   ) {
-    const user = await User.findOne({ sub: userSub });
-    if (!user) {
-      return { error: "User not found" };
-    }
+    try {
+      const user = await User.findOne({ sub: userSub });
+      if (!user) {
+        return { error: "User not found" };
+      }
 
-    console.log(start, end, owner, repo, "START AND END AND OWNER AND REPO");
-    await logToFile("changelog.log", `start: ${start}, end: ${end}, owner: ${owner}, repo: ${repo}`);
+      console.log(start, end, owner, repo, "START AND END AND OWNER AND REPO");
+      await logToFile(
+        "changelog.log",
+        `start: ${start}, end: ${end}, owner: ${owner}, repo: ${repo}`
+      );
 
-    const commits = await fetchCommits({
-      start,
-      end,
-      owner,
-      repo,
-      token: user.accessToken,
-    });
+      const commits = await fetchCommits({
+        start,
+        end,
+        owner,
+        repo,
+        token: user.accessToken,
+      });
+      await logToFile(
+        "changelog.log",
+        `commits: ${JSON.stringify(commits.slice(0, 10))}`
+      );
 
-    const commitDiffs = await Promise.all(
-      commits.map((commit: any) =>
-        fetchCommitDiffs(commit.sha, owner, repo, user.accessToken)
-      )
-    );
+      const commitDiffs = await Promise.all(
+        commits.map((commit: any) =>
+          fetchCommitDiffs(commit.sha, owner, repo, user.accessToken)
+        )
+      );
 
-    const promptData = prompt(
-      commits[0].sha,
-      commits[commits.length - 1].sha,
-      commitDiffs.join("\n")
-    );
+      const promptData = prompt(
+        commits[0].sha,
+        commits[commits.length - 1].sha,
+        commitDiffs.join("\n")
+      );
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{ role: "user", content: promptData }],
-      response_format: { type: "json_object" },
-    });
+      await logToFile(
+        "changelog.log",
+        `promptData: ${JSON.stringify(promptData)}`
+      );
 
-    if (!response.choices[0].message.content) {
+      // console.log(promptData, "[GENERATE FLOW]: PROMPT DATA");
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: promptData }],
+        response_format: { type: "json_object" },
+      });
+
+      if (!response.choices[0].message.content) {
+        return { error: "Failed to generate changelog" };
+      }
+
+      const changelog = JSON.parse(response.choices[0].message.content);
+
+      await logToFile(
+        "changelog.log",
+        `changelog: ${JSON.stringify(changelog)}`
+      );
+
+      console.log(changelog, "[GENERATE FLOW]: CHANGELOG");
+
+      const changeLogInDb = await Changelog.create({
+        userSub,
+        changelog: response.choices[0].message.content,
+      });
+
+      return changeLogInDb;
+    } catch (error) {
+      console.error(error, "ERROR FROM GENERATE CHANGELOG");
       return { error: "Failed to generate changelog" };
     }
-
-    const changelog = JSON.parse(response.choices[0].message.content);
-
-    const changeLogInDb = await Changelog.create({
-      userSub,
-      changelog: response.choices[0].message.content,
-    });
-
-    return changeLogInDb;
   }
 }
 

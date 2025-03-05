@@ -12,6 +12,6 @@ Also suggest a short, descriptive title for this changelog.
 Return your result in JSON with structure:
 {
   "title": "...",
-  "summaryBulletPoints": ["...", "..."]
+  "summaryBulletPoints": "This should be a concise summary of the changes in bullet points and in a markdown format"
 }
 `;
