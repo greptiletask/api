@@ -50,9 +50,27 @@ async function getProjectController(req: Request, res: Response) {
   });
 }
 
+async function addDomainController(req: Request, res: Response) {
+  console.log("[ADD DOMAIN CONTROLLER]: REQ", req.body);
+  const { projectSlug, domain } = req.body;
+  console.log(
+    "[ADD DOMAIN CONTROLLER]: PROJECT SLUG",
+    projectSlug,
+    "DOMAIN",
+    domain
+  );
+  const project = await changelogService.addDomain(projectSlug, domain);
+  console.log("[ADD DOMAIN CONTROLLER]: PROJECT", project);
+  return res.status(200).json({
+    project: project,
+    status: 200,
+  });
+}
+
 export const ChangelogController = {
   createChangelogController,
   getChangelogsController,
   getProjectsController,
   getProjectController,
+  addDomainController,
 };

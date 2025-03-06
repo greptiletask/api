@@ -65,10 +65,21 @@ class ChangelogService {
   }
 
   async getProject(userSub: string, projectSlug: string) {
+    console.log("[GET PROJECT]: PROJECT SLUG", projectSlug);
     const project = await Project.findOne({
-      userId: userSub,
       slug: projectSlug,
     });
+    return project;
+  }
+
+  async addDomain(projectSlug: string, domain: string) {
+    console.log("[ADD DOMAIN]: PROJECT SLUG", projectSlug, "DOMAIN", domain);
+    const project = await Project.findOneAndUpdate(
+      { slug: projectSlug },
+      { customDomain: domain },
+      { new: true }
+    );
+    console.log("[ADD DOMAIN]: PROJECT", project);
     return project;
   }
 }
