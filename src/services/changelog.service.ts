@@ -8,7 +8,8 @@ class ChangelogService {
     version: string,
     repo: string,
     userSub: string,
-    projectSlug: string
+    projectSlug: string,
+    title: string
   ) {
     console.log(
       changelog,
@@ -43,6 +44,7 @@ class ChangelogService {
       repo,
       userId: userSub,
       projectSlug: projectSlug,
+      title,
     });
     if (!newChangelog) {
       throw new Error("Failed to create changelog");
