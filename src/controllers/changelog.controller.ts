@@ -2,16 +2,19 @@ import changelogService from "../services/changelog.service";
 import { Request, Response } from "express";
 
 async function createChangelogController(req: Request, res: Response) {
-  const { changelog, version, repo, projectId } = req.body;
+  const { changelog, version, repo, projectSlug } = req.body;
   const userSub = (req as any).userSub;
   const newChangelog = await changelogService.createChangelog(
     changelog,
     version,
     repo,
     userSub,
-    projectId
+    projectSlug
   );
-  return res.status(200).json(newChangelog);
+  return res.status(200).json({
+    message: "Changelog created successfully",
+    changelog: newChangelog,
+  });
 }
 
 async function getChangelogsController(req: Request, res: Response) {

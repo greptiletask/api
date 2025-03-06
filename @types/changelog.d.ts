@@ -5,5 +5,5 @@ export interface Changelog {
   repo: string;
   createdAt: Date;
   updatedAt: Date;
-  projectId: string;
+  projectSlug: string;
 }

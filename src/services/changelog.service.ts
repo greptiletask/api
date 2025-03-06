@@ -8,33 +8,34 @@ class ChangelogService {
     version: string,
     repo: string,
     userSub: string,
-    projectId: string
+    projectSlug: string
   ) {
     console.log(changelog, "[CREATE CHANGELOG]: CHANGELOG");
     if (!changelog || !version || !repo || !userSub) {
       throw new Error("Missing required fields");
     }
-    let projectIdToUse = projectId;
-    if (!projectId) {
+    const projectFromDb = await Project.findOne({
+      userId: userSub,
+      slug: projectSlug,
+    });
+    if (!projectFromDb) {
       const project = await Project.create({
-        projectId: uuidv4(),
         userId: userSub,
         repoFullName: repo,
         customDomain: "",
         isDomainVerified: false,
-        slug: slugify(repo),
+        slug: projectSlug,
       });
       if (!project) {
         throw new Error("Failed to create project");
       }
-      projectIdToUse = project.projectId;
     }
     const newChangelog = await Changelog.create({
       changelog,
       version,
       repo,
       userId: userSub,
-      projectId: projectIdToUse,
+      projectSlug: projectSlug,
     });
     if (!newChangelog) {
       throw new Error("Failed to create changelog");
@@ -44,7 +45,7 @@ class ChangelogService {
   }
   async getChangelogs(projectSlug: string) {
     const changelogs = await Changelog.find({
-      slug: projectSlug,
+      projectSlug: projectSlug,
     });
     return changelogs;
   }
