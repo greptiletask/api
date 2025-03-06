@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import { Project } from "../../@types/project";
 const projectSchema = new mongoose.Schema({
-  projectId: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  userId: { type: String, required: true },
   repoFullName: { type: String, required: true },
   customDomain: { type: String, required: false },
   isDomainVerified: { type: Boolean, default: false },

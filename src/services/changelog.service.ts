@@ -10,7 +10,14 @@ class ChangelogService {
     userSub: string,
     projectSlug: string
   ) {
-    console.log(changelog, "[CREATE CHANGELOG]: CHANGELOG");
+    console.log(
+      changelog,
+      version,
+      repo,
+      userSub,
+      projectSlug,
+      "[CREATE CHANGELOG]: CHANGELOG"
+    );
     if (!changelog || !version || !repo || !userSub) {
       throw new Error("Missing required fields");
     }
