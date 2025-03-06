@@ -5,6 +5,7 @@ const projectSchema = new mongoose.Schema({
   repoFullName: { type: String, required: true },
   customDomain: { type: String, required: false },
   isDomainVerified: { type: Boolean, default: false },
+  verificationToken: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   slug: { type: String, required: true, unique: true },

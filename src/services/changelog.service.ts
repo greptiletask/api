@@ -1,7 +1,8 @@
 import Changelog from "../models/changelog.model";
 import Project from "../models/project.model";
-import { v4 as uuidv4 } from "uuid";
-import slugify from "slugify";
+import dns from "dns/promises";
+import crypto from "crypto";
+
 class ChangelogService {
   async createChangelog(
     changelog: string,
@@ -74,13 +75,60 @@ class ChangelogService {
 
   async addDomain(projectSlug: string, domain: string) {
     console.log("[ADD DOMAIN]: PROJECT SLUG", projectSlug, "DOMAIN", domain);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
     const project = await Project.findOneAndUpdate(
       { slug: projectSlug },
-      { customDomain: domain },
+      { customDomain: domain, verificationToken },
       { new: true }
     );
     console.log("[ADD DOMAIN]: PROJECT", project);
     return project;
+  }
+
+  async verifyDomain(userSub: string, projectSlug: string) {
+    // 1) Find the project
+    const project = await Project.findOne({
+      slug: projectSlug,
+      userId: userSub,
+    });
+    if (!project) {
+      throw new Error("Project not found or you do not own it");
+    }
+    if (!project.customDomain) {
+      throw new Error("No custom domain set");
+    }
+    if (!project.verificationToken) {
+      throw new Error("No verification token");
+    }
+
+    const domain = project.customDomain.trim().toLowerCase();
+    let txtRecords: any;
+    try {
+      txtRecords = await dns.resolveTxt(domain);
+    } catch (err) {
+      console.error("[VERIFY DOMAIN] DNS Error:", err);
+      throw new Error("DNS lookup failed");
+    }
+
+    console.log("[VERIFY DOMAIN] TXT RECORDS", txtRecords);
+    if (!txtRecords) {
+      throw new Error("No TXT records found");
+    }
+
+    const flattened = txtRecords.map((arr: any) => arr.join("").trim());
+    console.log("[VERIFY DOMAIN] FLATTENED", flattened);
+
+    if (!flattened.includes(project.verificationToken)) {
+      throw new Error("Token not found in DNS TXT records");
+    }
+
+    const updatedProject = await Project.findOneAndUpdate(
+      { slug: projectSlug },
+      { isDomainVerified: true },
+      { new: true }
+    );
+    console.log("[VERIFY DOMAIN] UPDATED PROJECT", updatedProject);
+    return updatedProject;
   }
 }
 

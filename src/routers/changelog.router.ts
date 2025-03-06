@@ -19,5 +19,8 @@ router.get("/projects/:projectSlug", verifyToken, (req, res) => {
 router.post("/projects/:projectSlug/domains", verifyToken, (req, res) => {
   ChangelogController.addDomainController(req, res);
 });
+router.get("/projects/:projectSlug/domains/verify", verifyToken, (req, res) => {
+  ChangelogController.verifyDomainController(req, res);
+});
 
 export default router;

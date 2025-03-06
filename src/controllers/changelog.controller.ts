@@ -67,10 +67,20 @@ async function addDomainController(req: Request, res: Response) {
   });
 }
 
+async function verifyDomainController(req: Request, res: Response) {
+  const { projectSlug } = req.params;
+  const userSub = (req as any).userSub;
+  const project = await changelogService.verifyDomain(userSub, projectSlug);
+  return res.status(200).json({
+    project: project,
+    status: 200,
+  });
+}
 export const ChangelogController = {
   createChangelogController,
   getChangelogsController,
   getProjectsController,
   getProjectController,
   addDomainController,
+  verifyDomainController,
 };
