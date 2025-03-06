@@ -7,7 +7,7 @@ const router = Router();
 router.post("/", verifyToken, (req, res) => {
   ChangelogController.createChangelogController(req, res);
 });
-router.get("/:projectSlug", (req, res) => {
+router.get("/changelogs/:projectSlug", (req, res) => {
   ChangelogController.getChangelogsController(req, res);
 });
 router.get("/projects", verifyToken, (req, res) => {
