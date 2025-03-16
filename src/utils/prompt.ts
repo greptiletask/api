@@ -6,7 +6,8 @@ The diffs are:
 ${combinedDiffs}
 """
 Please produce a concise bulleted list describing the changes,
-focusing on externally visible changes, please do not include technical details of code implementation and changes.
+focusing on externally visible(product level) changes which will matter to the customer, please do not include technical details of code implementation and changes.
+For example, if the changes include refactoring the code, this is not a customer-facing change and should not be included in the changelog.
 Also suggest a short, descriptive title for this changelog. 
 
 Return your result in JSON with structure:

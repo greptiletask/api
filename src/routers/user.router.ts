@@ -23,7 +23,7 @@ router.get("/fetch-or-create", async (req, res) => {
  * GET /user/:sub
  * Fetch a user by sub (user identifier).
  */
-router.get("/:sub", async (req, res) => {
+router.get("/", async (req, res) => {
   await UserController.fetchUserController(req, res);
 });
 
