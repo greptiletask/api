@@ -128,7 +128,8 @@ class GithubService {
     repo: string,
     start: string,
     end: string,
-    version: string
+    version: string,
+    response_style: string
   ) {
     try {
       const user = await User.findOne({ sub: userSub });
@@ -161,9 +162,10 @@ class GithubService {
       );
 
       const promptData = prompt(
-        commits[0].sha,
-        commits[commits.length - 1].sha,
-        commitDiffs.join("\n")
+        start,
+        end,
+        commitDiffs.join("\n"),
+        response_style
       );
 
       await logToFile(

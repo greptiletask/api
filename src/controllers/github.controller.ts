@@ -87,7 +87,7 @@ async function fetchReposController(req: Request, res: Response) {
 async function generateChangelogController(req: Request, res: Response) {
   try {
     const userSub = (req as any).userSub;
-    const { owner, repo, start, end, version } = req.body;
+    const { owner, repo, start, end, version, response_style } = req.body;
 
     if (!userSub || !owner || !repo || !start || !end) {
       return res
@@ -101,7 +101,8 @@ async function generateChangelogController(req: Request, res: Response) {
       repo,
       start,
       end,
-      version
+      version,
+      response_style
     );
 
     if ((changelog as any).error) {
