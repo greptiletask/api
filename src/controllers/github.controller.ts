@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import githubService from "../services/github.service";
-import userService from "../services/user.service";
 
 async function fetchGHUserController(req: Request, res: Response) {
   try {
