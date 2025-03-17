@@ -87,7 +87,8 @@ async function fetchReposController(req: Request, res: Response) {
 async function generateChangelogController(req: Request, res: Response) {
   try {
     const userSub = (req as any).userSub;
-    const { owner, repo, start, end, version, response_style } = req.body;
+    const { owner, repo, start, end, version, response_style, branch } =
+      req.body;
 
     if (!userSub || !owner || !repo || !start || !end) {
       return res
@@ -102,7 +103,8 @@ async function generateChangelogController(req: Request, res: Response) {
       start,
       end,
       version,
-      response_style
+      response_style,
+      branch
     );
 
     if ((changelog as any).error) {
@@ -119,7 +121,7 @@ async function generateChangelogController(req: Request, res: Response) {
 async function fetchCommitsController(req: Request, res: Response) {
   try {
     const userSub = (req as any).userSub;
-    const { owner, repo, start, end } = req.query;
+    const { owner, repo, start, end, branch } = req.query;
 
     if (!userSub || !owner || !repo || !start || !end) {
       return res
@@ -132,7 +134,8 @@ async function fetchCommitsController(req: Request, res: Response) {
       owner as string,
       repo as string,
       start as string,
-      end as string
+      end as string,
+      branch as string
     );
 
     if ((commits as any).error) {

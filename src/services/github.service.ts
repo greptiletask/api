@@ -101,7 +101,8 @@ class GithubService {
     owner: string,
     repo: string,
     start: string,
-    end: string
+    end: string,
+    branch: string
   ) {
     const user = await User.findOne({ sub: userSub });
     if (!user) {
@@ -114,6 +115,7 @@ class GithubService {
         owner,
         repo,
         token: user.accessToken,
+        branch,
       });
       return commits;
     } catch (error) {
@@ -129,7 +131,8 @@ class GithubService {
     start: string,
     end: string,
     version: string,
-    response_style: string
+    response_style: string,
+    branch: string
   ) {
     try {
       const user = await User.findOne({ sub: userSub });
@@ -149,6 +152,7 @@ class GithubService {
         owner,
         repo,
         token: user.accessToken,
+        branch,
       });
       await logToFile(
         "changelog.log",

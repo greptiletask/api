@@ -8,14 +8,18 @@ export async function fetchCommits({
   owner,
   repo,
   token,
+  branch,
 }: {
   start: string;
   end: string;
   owner: string;
   repo: string;
   token: string;
+  branch: string;
 }) {
-  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/commits?since=${start}&until=${end}`;
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/commits?since=${start}&until=${end}${
+    branch ? `&sha=${branch}` : ""
+  }`;
 
   const { data } = await axios.get(url, {
     headers: {
