@@ -6,7 +6,7 @@ import { prompt } from "../utils/prompt";
 import { GITHUB_API_URL } from "../utils/constants";
 
 import { openai } from "../configs/openai.client";
-import { fetchUserRepos } from "../workers/fetch-repos";
+import { fetchUserRepos, fetchBranches } from "../workers/fetch-repos";
 import { fetchCommits, fetchCommitDiffs } from "../workers/fetch-diffs";
 import { logToFile } from "../utils/log";
 dotenv.config();
@@ -94,6 +94,15 @@ class GithubService {
     }
     const repos = await fetchUserRepos(user.accessToken);
     return repos;
+  }
+
+  async fetchBranches(userSub: string, owner: string, repo: string) {
+    const user = await User.findOne({ sub: userSub });
+    if (!user) {
+      return { error: "User not found" };
+    }
+    const branches = await fetchBranches(owner, repo, user.accessToken);
+    return branches;
   }
 
   async fetchCommits(

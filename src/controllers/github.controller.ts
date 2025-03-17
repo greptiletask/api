@@ -84,6 +84,30 @@ async function fetchReposController(req: Request, res: Response) {
   }
 }
 
+async function fetchBranchesController(req: Request, res: Response) {
+  try {
+    const userSub = (req as any).userSub;
+    const { owner, repo } = req.query;
+
+    if (!userSub || !owner || !repo) {
+      return res
+        .status(400)
+        .json({ error: "userSub, owner, repo are required" });
+    }
+
+    const branches = await githubService.fetchBranches(
+      userSub,
+      owner as string,
+      repo as string
+    );
+
+    return res.json(branches);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to fetch branches" });
+  }
+}
+
 async function generateChangelogController(req: Request, res: Response) {
   try {
     const userSub = (req as any).userSub;
@@ -156,4 +180,5 @@ export const GithubController = {
   fetchReposController,
   generateChangelogController,
   fetchCommitsController,
+  fetchBranchesController,
 };

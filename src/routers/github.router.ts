@@ -35,6 +35,14 @@ router.get("/repos", (req, res) => {
   GithubController.fetchReposController(req, res);
 });
 
+/** 
+ * GET /github/branches
+ * Query param: ?userId=xxx&owner=xxx&repo=xxx
+ */
+router.get("/branches", (req, res) => {
+  GithubController.fetchBranchesController(req, res);
+});
+
 /**
  * POST /github/generate-changelog
  * Request body: { userId, owner, repo, start, end }
