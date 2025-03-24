@@ -8,6 +8,8 @@ import cors from "cors";
 import connectDB from "./configs/db.config";
 import changelogRouter from "./routers/changelog.router";
 import bodyParser from "body-parser";
+import scheduleRouter from "./routers/schedule.router";
+import scanRouter from "./routers/scan.router";
 dotenv.config();
 
 const app: Express = express();
@@ -24,9 +26,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 app.use("/api/user", verifyToken, userRouter);
 
 app.use("/api/github", verifyToken, githubRouter);
+
+app.use("/api/schedule", verifyToken, scheduleRouter);
+
+app.use("/api/scan", scanRouter);
 
 app.use("/api/changelog", changelogRouter);
 
