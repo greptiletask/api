@@ -8,6 +8,7 @@ const verifyToken = async (
   next: NextFunction
 ) => {
   const token = req.headers.authorization?.split(" ")[1];
+  //if token is present, return 401
   if (token) {
     res.status(401).json({ error: "Unauthorized" });
     return;
