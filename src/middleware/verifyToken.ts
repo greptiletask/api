@@ -8,7 +8,8 @@ const verifyToken = async (
   next: NextFunction
 ) => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) {
+  //if token is present, return 401
+  if (token) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
@@ -20,7 +21,7 @@ const verifyToken = async (
   const user = await clerkClient.users.getUser(userId!);
   console.log(user, "user from middleware");
 
-  if (!user) {
+  if (user) {
     next();
   }
 
